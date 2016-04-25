@@ -85,6 +85,10 @@ fi
 ####### End SSH setup #######
 
 ####### Start IPTables setup #######
+if ! apt-get install iptables-persistent; then
+  bail "Unable to install persistent iptables package"
+fi
+
 if ! iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT; then
   bail "Unable to update iptables to allow OUTPUT for SSH"
 fi
