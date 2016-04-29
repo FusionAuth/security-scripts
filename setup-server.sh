@@ -40,8 +40,13 @@ function replace_uncomment_or_append {
   rm ${file_name}.bak > /dev/null 2>&1
 }
 
+function log_error {
+  echo -e "\e[91m************** ${1} **************"
+}
+
 if [[ $# != 3 ]]; then
-  bail "Usage: setup-server.sh <ordinary-username> <ssh-public-key-file> <iptable-config-file>"
+  echo "Usage: setup-server.sh <ordinary-username> <ssh-public-key-file> <iptable-config-file>"
+  exit 1
 fi
 
 ORDINARY_USER=$1
@@ -56,7 +61,15 @@ if ! [ -f ${IPTABLE_CFG_FILE} ]; then
   bail "Invalid IPTables configuration file"
 fi
 
-####### Start SSH setup #######
+####### Start Password Setup #######
+if ! apt-get -qq -y install libpam-cracklib > /dev/null 2>&1; then
+  log_error "Unable to setup the PAM Cracklib module. This isn't required, but it does help secure passwords so you might want to set it up later"
+else
+  replace_uncomment_or_append /etc/pam.d/common-password "password.*requisite.*pam_cracklib.so.*ucredit" "password.*pam_cracklib.so" "password\trequisite\t\t\tpam_cracklib.so retry=3 minlen=10 difok=3 ucredit=-1 lcredit=-2 dcredit=-1 ocredit=-1"
+fi
+####### End Password Setup #######
+
+####### Start SSH Setup #######
 echo "Adding the ordinary user"
 if useradd -m -G sudo -s /bin/bash ${ORDINARY_USER}; then
   echo "Please provide the password for the ${ORDINARY_USER}"
@@ -103,18 +116,18 @@ if apt-get -qq -y install libpam-google-authenticator > /dev/null 2>&1; then
   replace_uncomment_or_append /etc/ssh/sshd_config "^AuthenticationMethods publickey,keyboard-interactive" "AuthenticationMethods .+$" "AuthenticationMethods publickey,keyboard-interactive"
 
   if ! apt-get -qq -y install ntp; then
-    echo "************** Unable to install the Network Time Protocol services so that the Google Authenticator works properly. You should figure out why this failed and install NTP manually **************"
+    log_error "Unable to install the Network Time Protocol services so that the Google Authenticator works properly. You should figure out why this failed and install NTP manually"
   fi
 else
-  echo "Unable to install the Google Authenticator library. Skipping the configuration steps for that"
+  log_error "Unable to install the Google Authenticator library. Skipping the configuration steps for that"
 fi
 
 if ! service ssh restart; then
-  echo "************** Unable to restart the SSH daemon. Everything appears to be okay otherwise. You'll just need to figure out why the reload failed **************"
+  log_error "Unable to restart the SSH daemon. Everything appears to be okay otherwise. You'll just need to figure out why the reload failed"
 fi
-####### End SSH setup #######
+####### End SSH Setup #######
 
-####### Start IPTables setup #######
+####### Start IPTables Setup #######
 echo "Installing the Persistent IPTables package"
 if ! apt-get -qq -y install iptables-persistent; then
   bail "Unable to install persistent iptables package"
@@ -122,7 +135,7 @@ fi
 
 cp /etc/iptables/rules.v4 /etc/iptables/rules.v4.orig
 cp ${IPTABLE_CFG_FILE} /etc/iptables/rules.v4
-if grep "%APPLICATION_SERVER_IP%" /etc/iptables/rules.v4; then
+if grep "%APPLICATION_SERVER_IP%" /etc/iptables/rules.v4 > /dev/null; then
   echo "Enter the IP address of the Application Server"
   read APPLICATION_SERVER_IP
   sed -i.bak "s/%APPLICATION_SERVER_IP%/${APPLICATION_SERVER_IP}/g" /etc/iptables/rules.v4
@@ -130,15 +143,14 @@ if grep "%APPLICATION_SERVER_IP%" /etc/iptables/rules.v4; then
 fi
 
 if ! service netfilter-persistent reload; then
-  echo "************** Unable to reload the IPTables configuration. Everything appears to be okay otherwise. You'll just need to figure out why the reload failed **************"
+  log_error "Unable to reload the IPTables configuration. Everything appears to be okay otherwise. You'll just need to figure out why the reload failed"
 fi
-####### End IPTables setup #######
+####### End IPTables Setup #######
 
-####### Start Monit setup #######
+####### Start Monit Setup #######
 echo "Installing Monit for login/intrusion detection"
 if apt-get -qq -y install monit > /dev/null 2>&1; then
   if ! grep "^set alert ${MONIT_EMAIL}" /etc/monit/monitrc > /dev/null 2>&1; then
-    cp monit-ssh-logins.cfg /etc/monit/conf.d/ssh-logins
     echo "Enter the SMTP host"
     read SMTP_HOST
     echo "Enter the SMTP port"
@@ -162,13 +174,41 @@ if apt-get -qq -y install monit > /dev/null 2>&1; then
     echo "set alert ${MONIT_EMAIL} not on { instance, action }" >> /etc/monit/monitrc
 
     if ! service monit restart; then
-      echo "Unable to restart Monit. Everything appears to be okay otherwise. You'll just need to figure out why the reload failed"
+      log_error "Unable to restart Monit. Everything appears to be okay otherwise. You'll just need to figure out why the reload failed"
+    fi
+
+    ANSWER=""
+    while [[ ${ANSWER} != "y" && ${ANSWER} != "n" ]]; do
+      echo "Install Ruby and Monit Slack/Pushover integration? (y/n)"
+      read ANSWER
+    done
+    if [[ ${ANSWER} = "y" ]]; then
+      if ! apt-get install ruby; then
+        log_error "Unable to install Ruby. Skipping Monit Slack/Pushover integration"
+      else
+        cp monit-ssh-logins-exec.cfg /etc/monit/conf.d/ssh-logins
+
+        echo "Enter the Slack Hostname (i.e. https://hostname.slack.com"
+        read SLACK_HOSTNAME
+        echo "Enter the Slack API key"
+        read SLACK_API_KEY
+        echo "Enter the Slack channel to post in"
+        read SLACK_CHANNEL
+        echo "Enter the Pushover Application key"
+        read PUSHOVER_APPLICATION
+        echo "Enter the Pushover user/group key"
+        read PUSHOVER_USER
+
+        sed "s/%SLACK_HOSTNAME%/${SLACK_HOSTNAME}/g;s/%SLACK_API_KEY%/${SLACK_API_KEY}/g;s/%SLACK_CHANNEL%/${SLACK_CHANNEL}/g;s/%PUSHOVER_APPLICATION%/${PUSHOVER_APPLICATION}/g;s/%PUSHOVER_USER%/${PUSHOVER_USER}/g" < monit-slack-pushover.rb > /etc/monit/monit-slack-pushover.rb
+      fi
+    else
+      cp monit-ssh-logins-alert.cfg /etc/monit/conf.d/ssh-logins
     fi
   fi
 else
   echo "Unable to install Monit. Skipping the intrusion detection for SSH logins"
 fi
-####### End Monit setup #######
+####### End Monit Setup #######
 
 ####### Start Lock Root Account #######
 if ! usermod -p '*' root; then
