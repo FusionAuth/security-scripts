@@ -44,6 +44,17 @@ function log_error {
   echo -e "\e[91m************** ${1} **************"
 }
 
+function ask_yes_no {
+  ANSWER=""
+  while [[ ${ANSWER} != "y" && ${ANSWER} != "n" ]]; do
+    echo ${1}
+    read ANSWER
+  done
+
+  return ${ANSWER}
+}
+
+
 if [[ $# != 3 ]]; then
   echo "Usage: setup-server.sh <ordinary-username> <ssh-public-key-file> <iptable-config-file>"
   exit 1
@@ -162,7 +173,7 @@ if apt-get -qq -y install monit > /dev/null 2>&1; then
 
     SMTP_ENCRYPTION=""
     while [[ ${SMTP_ENCRYPTION} != "ssl" && ${SMTP_ENCRYPTION} != "tlsv12" ]]; do
-      echo "Enter the SMTP encryption (ssl or tlsv12)"
+      echo "Enter the SMTP encryption (ssl or tlsv12 - older versions of Monit require tlsv12 to work properly)"
       read SMTP_ENCRYPTION
     done
 
@@ -177,29 +188,34 @@ if apt-get -qq -y install monit > /dev/null 2>&1; then
       log_error "Unable to restart Monit. Everything appears to be okay otherwise. You'll just need to figure out why the reload failed"
     fi
 
-    ANSWER=""
-    while [[ ${ANSWER} != "y" && ${ANSWER} != "n" ]]; do
-      echo "Install Ruby and Monit Slack/Pushover integration? (y/n)"
-      read ANSWER
-    done
-    if [[ ${ANSWER} = "y" ]]; then
+    ask_yes_no "Install Ruby and Monit Slack/Pushover integration? (y/n)"
+    if [[ ${?} == "y" ]]; then
       if ! apt-get install ruby; then
         log_error "Unable to install Ruby. Skipping Monit Slack/Pushover integration"
       else
         cp monit-ssh-logins-exec.cfg /etc/monit/conf.d/ssh-logins
 
-        echo "Enter the Slack Hostname (i.e. https://hostname.slack.com"
-        read SLACK_HOSTNAME
-        echo "Enter the Slack API key"
-        read SLACK_API_KEY
-        echo "Enter the Slack channel to post in"
-        read SLACK_CHANNEL
-        echo "Enter the Pushover Application key"
-        read PUSHOVER_APPLICATION
-        echo "Enter the Pushover user/group key"
-        read PUSHOVER_USER
+        ask_yes_no "Enable Slack notifications? (y/n)"
+        SLACK_WEBHOOK_URL="Not-Enabled"
+        if [[ ${?} == "y" ]]; then
+          echo "Enter the Slack Webhook URL (i.e. https://hooks.slack.com/services/A0411FLaa/B004CKBBB/E7eeeea2a7a1U6EUhnIAus6z)"
+          read SLACK_WEBHOOK_URL
+          SLACK_ENABLED="true"
+        fi
 
-        sed "s/%SLACK_HOSTNAME%/${SLACK_HOSTNAME}/g;s/%SLACK_API_KEY%/${SLACK_API_KEY}/g;s/%SLACK_CHANNEL%/${SLACK_CHANNEL}/g;s/%PUSHOVER_APPLICATION%/${PUSHOVER_APPLICATION}/g;s/%PUSHOVER_USER%/${PUSHOVER_USER}/g" < monit-slack-pushover.rb > /etc/monit/monit-slack-pushover.rb
+        ask_yes_no "Enable Pushover notifications? (y/n)"
+        PUSHOVER_APPLICATION="Not-Enabled"
+        PUSHOVER_USER="Not-Enabled"
+        if [[ ${?} == "y" ]]; then
+          echo "Enter the Pushover Application key"
+          read PUSHOVER_APPLICATION
+          echo "Enter the Pushover user/group key"
+          read PUSHOVER_USER
+          SLACK_ENABLED="true"
+        fi
+
+        sed "s/%SLACK_WEBHOOK_URL%/${SLACK_WEBHOOK_URL}/g;s/%PUSHOVER_APPLICATION%/${PUSHOVER_APPLICATION}/g;s/%PUSHOVER_USER%/${PUSHOVER_USER}/g" < monit-slack-pushover.rb > /etc/monit/monit-slack-pushover.rb
+        chmod +x /etc/monit/monit-slack-pushover.rb
       fi
     else
       cp monit-ssh-logins-alert.cfg /etc/monit/conf.d/ssh-logins
