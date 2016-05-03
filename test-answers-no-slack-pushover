@@ -1,0 +1,8 @@
+10.10.10.10
+monit-alerts@test.com
+smtp.test.com
+587
+smtp-username@test.com
+smtp-password
+tlsv12
+n

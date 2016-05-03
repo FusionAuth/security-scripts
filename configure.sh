@@ -9,6 +9,8 @@ function ask_yes_no {
   done
 }
 
+rm -rf output
+mkdir output
 
 echo "Enter the IP address of the Application Server"
 read application_server_ip
@@ -30,6 +32,8 @@ while [[ ${monit_smtp_encryption} != "ssl" && ${monit_smtp_encryption} != "tlsv1
 done
 if [[ ${monit_smtp_encryption} == "none" ]]; then
   monit_smtp_encryption=""
+else
+  monit_smtp_encryption="using ${monit_smtp_encryption}"
 fi
 
 ask_yes_no "Install Ruby and Monit Slack/Pushover integration? (y/n)"
@@ -54,16 +58,22 @@ if [[ ${answer} == "y" ]]; then
     read monit_pushover_user
     monit_pushover_enabled="true"
   fi
+
+  cp template/ubuntu-16.04/monit-ssh-logins-exec.cfg output/monit-ssh-logins.cfg
+  sed "s/@MONIT_SLACK_WEBHOOK_URL@/${monit_slack_webhook_url//\//\\/}/g;s/@MONIT_SLACK_ENABLED@/${monit_slack_enabled}/g;s/@MONIT_PUSHOVER_APPLICATION@/${monit_pushover_application}/g;s/@MONIT_PUSHOVER_USER@/${monit_pushover_user}/g;s/@MONIT_PUSHOVER_ENABLED@/${monit_pushover_enabled}/g" < template/ubuntu-16.04/monit-slack-pushover.rb > output/monit-slack-pushover.rb
+  chmod +x output/monit-slack-pushover.rb
+else
+  cp template/ubuntu-16.04/monit-ssh-logins-alert.cfg output/monit-ssh-logins.cfg
 fi
 
-cp template/ubuntu-16.04/backup.sh .
-cp template/ubuntu-16.04/common-password .
-cp template/ubuntu-16.04/iptables-application-server.cfg .
-cp template/ubuntu-16.04/monit-ssh-logins-alert.cfg .
-cp template/ubuntu-16.04/monit-ssh-logins-exec.cfg .
-chmod +x backup.sh
+cp template/ubuntu-16.04/backup.sh output
+cp template/ubuntu-16.04/common-password output
+cp template/ubuntu-16.04/iptables-application-server.cfg output
+cp template/ubuntu-16.04/setup-server.sh output
+cp template/ubuntu-16.04/sshd output
+cp template/ubuntu-16.04/sshd_config output
+chmod +x output/backup.sh
+chmod +x output/setup-server.sh
 
-sed "s/@APPLICATION_SERVER_IP@/${application_server_ip}/g" < template/ubuntu-16.04/iptables-database-server.cfg > iptables-database-server.cfg
-sed "s/@MONIT_SLACK_WEBHOOK_URL@/${monit_slack_webhook_url/\//\\\/}/g;s/@MONIT_SLACK_ENABLED@/${monit_slack_enabled}/g;s/@MONIT_PUSHOVER_APPLICATION@/${monit_pushover_application}/g;s/@MONIT_PUSHOVER_USER@/${monit_pushover_user}/g;s/@MONIT_PUSHOVER_ENABLED@/${monit_pushover_enabled}/g" < template/ubuntu-16.04/monit-slack-pushover.rb > monit-slack-pushover.rb
-sed "s/@MONIT_EMAIL_SERVER@/${monit_smtp_host}/g;s/@MONIT_EMAIL_PORT@/${monit_smtp_port}/g;s/@MONIT_EMAIL_USERNAME@/${monit_smtp_username}/g;s/@MONIT_EMAIL_PASSWORD@/${monit_smtp_password}/g;s/@MONIT_EMAIL_ENCRYPTION@/${monit_smtp_encryption}/g" < template/ubuntu-16.04/monitrc > monitrc
-chmod +x /etc/monit/monit-slack-pushover.rb
+sed "s/@APPLICATION_SERVER_IP@/${application_server_ip}/g" < template/ubuntu-16.04/iptables-database-server.cfg > output/iptables-database-server.cfg
+sed "s/@MONIT_EMAIL_SERVER@/${monit_smtp_host}/g;s/@MONIT_EMAIL_PORT@/${monit_smtp_port}/g;s/@MONIT_EMAIL_USERNAME@/${monit_smtp_username}/g;s/@MONIT_EMAIL_PASSWORD@/${monit_smtp_password}/g;s/@MONIT_EMAIL_ENCRYPTION@/${monit_smtp_encryption}/g" < template/ubuntu-16.04/monitrc > output/monitrc

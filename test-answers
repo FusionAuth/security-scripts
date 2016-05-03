@@ -1,0 +1,13 @@
+10.10.10.10
+monit-alerts@test.com
+smtp.test.com
+587
+smtp-username@test.com
+smtp-password
+tlsv12
+y
+y
+https://hooks.slack.com/services/A0411FLaa/B004CKBBB/E7eeeea2a7a1U6EUhnIAus6z
+y
+pushover-app
+pushover-user

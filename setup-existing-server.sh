@@ -54,6 +54,9 @@ function ask_yes_no {
 }
 
 
+echo "This script doesn't work yet"
+exit 1
+
 if [[ $# != 3 ]]; then
   echo "Usage: setup-server.sh <ordinary-username> <ssh-public-key-file> <iptable-config-file>"
   exit 1
