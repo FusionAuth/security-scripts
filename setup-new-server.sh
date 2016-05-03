@@ -6,7 +6,7 @@ function bail {
 }
 
 if [[ ${#} != 4 && ${#} != 5 ]]; then
-  echo "Usage: setup-new-server.sh <root@host> <ssh-public-key-file> <iptable-config-file> <ordinary-username> [ordinary-user-password]"
+  echo "Usage: setup-new-server.sh <root@host> <local-ssh-public-key-file> <local-iptable-config-file> <ordinary-username> [ordinary-user-password]"
   echo ""
   echo "    for example: setup-new-server.sh root@192.168.1.1 ~/.ssh/id_rsa.pub output/iptables-application-server.cfg myuser password"
   echo ""
@@ -45,5 +45,18 @@ if ! [ -f ${iptable_cfg_file} ]; then
   bail "Invalid IPTables configuration file"
 fi
 
-scp output/* ${ssh_key_file} ${root_at_host}:/root
-ssh -t ${root_at_host} "/root/setup-server.sh ${ssh_key_file} ${iptable_cfg_file} '${ordinary_user}' '${ordinary_user_password}'"
+# Prepare the bundle to go to the server
+rm -rf bundle
+mkdir bundle
+cp output/* bundle
+cp ${iptable_cfg_file} bundle/iptables.cfg
+cp ${ssh_key_file} bundle/ssh-public-key
+rm bundle/iptables-*-server.cfg
+
+# Transfer the bundle and execute it
+scp bundle/* ${root_at_host}:/root
+echo "Setting up the server. This might take a few minutes. There will be a log file in /root/setup.log after this is complete in case anything failed."
+ssh -t ${root_at_host} "/root/setup-server.sh ssh-public-key iptables.cfg '${ordinary_user}' '${ordinary_user_password}' > /root/setup.log 2>&1"
+
+# Clean up
+rm -rf bundle

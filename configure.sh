@@ -76,4 +76,4 @@ chmod +x output/backup.sh
 chmod +x output/setup-server.sh
 
 sed "s/@APPLICATION_SERVER_IP@/${application_server_ip}/g" < template/ubuntu-16.04/iptables-database-server.cfg > output/iptables-database-server.cfg
-sed "s/@MONIT_EMAIL_SERVER@/${monit_smtp_host}/g;s/@MONIT_EMAIL_PORT@/${monit_smtp_port}/g;s/@MONIT_EMAIL_USERNAME@/${monit_smtp_username}/g;s/@MONIT_EMAIL_PASSWORD@/${monit_smtp_password}/g;s/@MONIT_EMAIL_ENCRYPTION@/${monit_smtp_encryption}/g" < template/ubuntu-16.04/monitrc > output/monitrc
+sed "s/@MONIT_EMAIL_SERVER@/${monit_smtp_host}/g;s/@MONIT_EMAIL_PORT@/${monit_smtp_port}/g;s/@MONIT_EMAIL_USERNAME@/${monit_smtp_username}/g;s/@MONIT_EMAIL_PASSWORD@/${monit_smtp_password}/g;s/@MONIT_EMAIL_ENCRYPTION@/${monit_smtp_encryption}/g;s/@MONIT_ALERT_EMAIL@/${monit_alert_email}/g" < template/ubuntu-16.04/monitrc > output/monitrc
