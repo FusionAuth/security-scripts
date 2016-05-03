@@ -3,11 +3,11 @@
 require 'net/https'
 require 'json'
 
-slack_webhook_url="%SLACK_WEBHOOK_URL%"
-slack_enabled=%SLACK_ENABLED%
-pushover_application="%PUSHOVER_APPLICATION%"
-pushover_user="%PUSHOVER_USER%"
-pushover_enabled=%PUSHOVER_ENABLED%
+monit_slack_webhook_url="@MONIT_SLACK_WEBHOOK_URL@"
+monit_slack_enabled=@MONIT_SLACK_ENABLED@
+monit_pushover_application="@MONIT_PUSHOVER_APPLICATION@"
+monit_pushover_user="@MONIT_PUSHOVER_USER@"
+monit_pushover_enabled=@MONIT_PUSHOVER_ENABLED@
 
 def log(message)
   open('/var/log/monit.log', 'a') { |f|
@@ -15,9 +15,9 @@ def log(message)
   }
 end
 
-if slack_enabled
+if monit_slack_enabled
   begin
-    uri = URI.parse(slack_webhook_url)
+    uri = URI.parse(monit_slack_webhook_url)
     Net::HTTP.start(uri.host, uri.port, {use_ssl: true}) { |http|
       request = Net::HTTP::Post.new(uri.request_uri, {'Content-Type' => 'application/json'})
       request.body = {
@@ -31,12 +31,12 @@ if slack_enabled
   end
 end
 
-if pushover_enabled
+if monit_pushover_enabled
   begin
     uri = URI.parse("https://api.pushover.net/1/messages.json")
     Net::HTTP.start(uri.host, uri.port, {use_ssl: true}) { |http|
       request = Net::HTTP::Post.new(uri.request_uri, {'Content-Type' => 'multipart/form-data'})
-      request.set_form_data(token: pushover_application, user: pushover_user, message: "[#{ENV['MONIT_HOST']}] #{ENV['MONIT_SERVICE']} - #{ENV['MONIT_DESCRIPTION']}")
+      request.set_form_data(token: monit_pushover_application, user: monit_pushover_user, message: "[#{ENV['MONIT_HOST']}] #{ENV['MONIT_SERVICE']} - #{ENV['MONIT_DESCRIPTION']}")
       response = http.request(request)
       log("Response from Pushover [#{response.code}] [#{response.body}]")
     }
