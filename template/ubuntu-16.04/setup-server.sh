@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
+function bail {
+  echo "************** ${1} **************"
+  exit 1
+}
+
 if [[ ${#} != 4 ]]; then
-  echo "Usage: setup-server.sh <ssh-public-key-file> <iptable-config-file> <ordinary-username> <ordinar-user-password>"
+  echo "Usage: setup-server.sh <ssh-public-key-file> <iptable-config-file> <ordinary-username> <ordinary-user-password>"
   echo ""
   echo "    for example: setup-server.sh id_rsa.pub iptables-application-server.cfg myuser password"
   exit 1

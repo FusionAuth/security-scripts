@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+function bail {
+  echo "************** ${1} **************"
+  exit 1
+}
+
 if [[ ${#} != 4 && ${#} != 5 ]]; then
   echo "Usage: setup-new-server.sh <root@host> <ssh-public-key-file> <iptable-config-file> <ordinary-username> [ordinary-user-password]"
   echo ""
@@ -9,22 +14,23 @@ if [[ ${#} != 4 && ${#} != 5 ]]; then
   exit 1
 fi
 
-
 root_at_host=$1
 ssh_key_file=$2
 iptable_cfg_file=$3
 ordinary_user=$4
 
 ordinary_user_password=""
-ordinary_user_password_confirm=""
+ordinary_user_password_confirm="other"
 if [[ ${#} == 5 ]]; then
   ordinary_user_password=$5
 else
   while [[ ${ordinary_user_password} != ${ordinary_user_password_confirm} ]]; do
     echo -n "Password: "
     read -s ordinary_user_password
+    echo ""
     echo -n "Password (again): "
     read -s ordinary_user_password_confirm
+    echo ""
     if [[ ${ordinary_user_password} != ${ordinary_user_password_confirm} ]]; then
       echo "Passwords don't match"
     fi
@@ -40,4 +46,4 @@ if ! [ -f ${iptable_cfg_file} ]; then
 fi
 
 scp output/* ${ssh_key_file} ${root_at_host}:/root
-ssh -t ${root_at_host} "/root/setup-new-server.sh ${ssh_key_file} ${iptable_cfg_file} ${ordinary_user} ${ordinary_user_password}"
+ssh -t ${root_at_host} "/root/setup-server.sh ${ssh_key_file} ${iptable_cfg_file} '${ordinary_user}' '${ordinary_user_password}'"
