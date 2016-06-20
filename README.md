@@ -27,9 +27,16 @@ After you run the configure script, you can run the server setup script. This sc
 
 ## Chef
 
-You can also use the Chef recipe instead of the `configure.sh` and `setup-new-server.sh` scripts.
+You can also use the Chef Cookbook instead of the `configure.sh` and `setup-new-server.sh` scripts. The Chef Cookbook is located in the `chef-repo/cookbooks`. You can install this Cookbook in your Chef server by executing these commands:
 
-To use this Chef recipe, all you need to do is configure these required attributes:
+```
+$ cd chef-repo
+$ knife cookbook upload 2016_security_guide
+```
+
+This will add the Cookbook to the Chef server that is configured in your `knife.rb` file. From there, you can use the Cookbook to bootstrap your nodes.
+
+To use this Chef Cookbook, you first need to configure these required attributes:
 
   * `node['security_guide']['users']` - This is an array that contains the users that the Chef recipe will create on the server. Each user must have these attributes:
     * `username` - The username of the user
@@ -37,7 +44,7 @@ To use this Chef recipe, all you need to do is configure these required attribut
     * `public_key` - The RSA public key of the user
   * `node['security_guide']['monit']['alert_email]` - The email address where Monit alerts are sent
 
-In addition to the required attributes, the Chef recipe also takes these optional attributes:
+In addition to the required attributes, the Chef Cookbook also takes these optional attributes:
 
   * `node['security_guide']['sudo_group']` - The name of the group that grants a user sudo access (defaults to `sudo`)
   * `node['security_guide']['monit']['email_server']` - The name of the SMTP server Monit uses to send emails (defaults to `localhost`)
