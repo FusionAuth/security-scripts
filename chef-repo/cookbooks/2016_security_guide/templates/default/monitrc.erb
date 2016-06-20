@@ -83,7 +83,7 @@
 #
 # 2016-SECURITY-SCRIPT ADDITION: Email server configuration
 #
-set mailserver <%= @MONIT_EMAIL_SERVER %> port <%= @MONIT_EMAIL_PORT %> username "<%= @MONIT_EMAIL_USERNAME %>" password "<%= @MONIT_EMAIL_PASSWORD %>" <%= @MONIT_EMAIL_ENCRYPTION %>
+set mailserver <%= @MONIT_EMAIL_SERVER %> port <%= @MONIT_EMAIL_PORT %> <% if defined?(MONIT_EMAIL_USERNAME) && MONIT_EMAIL_USERNAME != '' %>username "<%= @MONIT_EMAIL_USERNAME %>"<% end %> <% if defined?(MONIT_EMAIL_PASSWORD) && MONIT_EMAIL_PASSWORD != '' %>password "<%= @MONIT_EMAIL_PASSWORD %>"<% end %> <% if defined?(MONIT_EMAIL_ENCRYPTION) && MONIT_EMAIL_ENCRYPTION != '' %><%= @MONIT_EMAIL_ENCRYPTION %><% end %>
 
 #                backup.bar.baz port 10025,  # backup mailserver on port 10025
 #                localhost                   # fallback relay

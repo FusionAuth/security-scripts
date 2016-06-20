@@ -4,41 +4,50 @@
 #
 # Copyright (c) 2016 Inversoft, All Rights Reserved.
 
-apt_≤update 'Update the apt cache daily' do
+if node['security_guide']['users'].length == 0 || node['security_guide']['monit'].attribute?('alert_email') == false
+  Chef::Application.fatal!('You must specify at least one user and an alert email for Monit')
+end
+
+apt_update 'Update the apt cache daily' do
   frequency 86_400
   action :periodic
 end
 
-# Create the ordinary user
-#  TODO - Set the password hash for the user here
-user 'ordinary-user' do
-  home '/home/orindary-user'
-  shell '/bin/bash'
-  passwd ''
-end
+# Create the ordinary users
+node['security_guide']['users'].each do |user|
+  user user.username do
+    home "/home/#{user.username}"
+    manage_home true
+    shell '/bin/bash'
+    password user.password
+  end
 
-# Add the ordinary user to the sudo group
-group 'sudo' do
-  action :modify
-  members 'ordinary-user'
-  append true
+  # Add the ordinary user to the sudo group
+  group node['security_guide']['sudo_group'] do
+    action :modify
+    members user.username
+    append true
+  end
+
+  # Setup SSH key's for the ordinary user
+  directory "/home/#{user.username}/.ssh" do
+    owner user.username
+    group user.username
+    mode '0700'
+    action :create
+  end
+  file "/home/#{user.username}/.ssh/authorized_keys" do
+    content user.public_key
+    owner user.username
+    group user.username
+    mode '0600'
+  end
 end
 
 # Disable rot user's password
 user 'root' do
   password '!'
   action :modify
-end
-
-# Setup SSH key's for the ordinary user
-cookbook_file '/home/ordinary-user/.ssh/authorized_keys' do
-  source 'authorized_keys'
-  owner 'ordinary-user'
-  group 'oridnary-user'
-  mode '0600'
-end
-file '/home/ordinary-user/.ssh' do
-  mode '0700'
 end
 
 # Install all the security packages
@@ -99,35 +108,33 @@ cookbook_file '/etc/monit/conf.d/ssh-logins' do
 end
 
 # Install the main Monit configuration file that sends the emails
-#  TODO - Set the Monit email settings
 template '/etc/monit/monitrc' do
   source 'monitrc.erb'
   owner 'root'
   group 'root'
   mode '0600'
   variables({
-    :MONIT_EMAIL_SERVER => '',
-    :MONIT_EMAIL_PORT => '',
-    :MONIT_EMAIL_USERNAME => '',
-    :MONIT_EMAIL_PASSWORD => '',
-    :MONIT_EMAIL_ENCRYPTION => 'tlsv12',
-    :MONIT_ALERT_EMAIL => ''
+    :MONIT_EMAIL_SERVER => node['security_guide']['monit']['email_server'],
+    :MONIT_EMAIL_PORT => node['security_guide']['monit']['email_port'],
+    :MONIT_EMAIL_USERNAME => node['security_guide']['monit']['email_username'],
+    :MONIT_EMAIL_PASSWORD => node['security_guide']['monit']['email_password'],
+    :MONIT_EMAIL_ENCRYPTION => node['security_guide']['monit']['email_encryption'],
+    :MONIT_ALERT_EMAIL => node['security_guide']['monit']['alert_email']
   })
 end
 
 # Install the Monit script to send alerts to Slack and Pushover
-#  TODO - Set the Monit Slack and Pushover settings
 template '/etc/monit/monit-slack-pushover.rb' do
   source 'monit-slack-pushover.rb.erb'
   owner 'root'
   group 'root'
-  mode '0600'
+  mode '0700'
   variables({
-    :MONIT_SLACK_WEBHOOK_URL => '',
-    :MONIT_SLACK_ENABLED => 'true',
-    :MONIT_PUSHOVER_APPLICATION => '',
-    :MONIT_PUSHOVER_USER => '',
-    :MONIT_PUSHOVER_ENABLED => 'true'
+    :MONIT_SLACK_WEBHOOK_URL => node['security_guide']['monit']['slack_url'],
+    :MONIT_SLACK_ENABLED => node['security_guide']['monit']['slack_enabled'],
+    :MONIT_PUSHOVER_APPLICATION => node['security_guide']['monit']['pushover_application'],
+    :MONIT_PUSHOVER_USER => node['security_guide']['monit']['pushover_user'],
+    :MONIT_PUSHOVER_ENABLED => node['security_guide']['monit']['pushover_enabled']
   })
 end
 
@@ -136,7 +143,7 @@ service 'ssh' do
   action :restart
 end
 service 'netfilter-persistent' do
-  action :reload
+  action :restart
 end
 service 'monit' do
   action :restart
