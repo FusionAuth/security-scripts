@@ -3,7 +3,7 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/chef-repo/cookbooks/2016_security_guide" type="cookbooks-root" />
+      <sourceFolder url="file://$MODULE_DIR$/chef-repo/cookbooks/2016-security-guide" type="cookbooks-root" />
       <excludeFolder url="file://$MODULE_DIR$/output" />
     </content>
     <orderEntry type="inheritedJdk" />
