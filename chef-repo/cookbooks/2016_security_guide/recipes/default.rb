@@ -4,6 +4,11 @@
 #
 # Copyright (c) 2016 Inversoft, All Rights Reserved.
 
+# Validate the attributes
+if node['security_guide']['users'].length == 0 || node['security_guide']['monit'].attribute?('alert_email') == false
+  Chef::Application.fatal!('You must specify at least one user and an alert email for Monit')
+end
+
 apt_update 'Update the apt cache daily' do
   frequency 86_400
   action :periodic
