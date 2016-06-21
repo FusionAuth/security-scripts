@@ -3,11 +3,11 @@
 require 'net/https'
 require 'json'
 
-monit_slack_webhook_url="<%= @MONIT_SLACK_WEBHOOK_URL %>"
-monit_slack_enabled=<%= @MONIT_SLACK_ENABLED %>
-monit_pushover_application="<%= @MONIT_PUSHOVER_APPLICATION %>"
-monit_pushover_user="<%= @MONIT_PUSHOVER_USER %>"
-monit_pushover_enabled=<%= @MONIT_PUSHOVER_ENABLED %>
+monit_slack_webhook_url="<%= node['security_guide']['monit']['slack_url'] %>"
+monit_slack_enabled=<%= node['security_guide']['monit']['slack_enabled'] %>
+monit_pushover_application="<%= node['security_guide']['monit']['pushover_application'] %>"
+monit_pushover_user="<%= node['security_guide']['monit']['pushover_user'] %>"
+monit_pushover_enabled=<%= node['security_guide']['monit']['pushover_enabled'] %>
 
 def log(message)
   open('/var/log/monit.log', 'a') { |f|

@@ -114,14 +114,6 @@ template '/etc/monit/monitrc' do
   owner 'root'
   group 'root'
   mode '0600'
-  variables({
-    :MONIT_EMAIL_SERVER => node['security_guide']['monit']['email_server'],
-    :MONIT_EMAIL_PORT => node['security_guide']['monit']['email_port'],
-    :MONIT_EMAIL_USERNAME => node['security_guide']['monit']['email_username'],
-    :MONIT_EMAIL_PASSWORD => node['security_guide']['monit']['email_password'],
-    :MONIT_EMAIL_ENCRYPTION => node['security_guide']['monit']['email_encryption'],
-    :MONIT_ALERT_EMAIL => node['security_guide']['monit']['alert_email']
-  })
 end
 
 # Install the Monit script to send alerts to Slack and Pushover
@@ -130,13 +122,6 @@ template '/etc/monit/monit-slack-pushover.rb' do
   owner 'root'
   group 'root'
   mode '0700'
-  variables({
-    :MONIT_SLACK_WEBHOOK_URL => node['security_guide']['monit']['slack_url'],
-    :MONIT_SLACK_ENABLED => node['security_guide']['monit']['slack_enabled'],
-    :MONIT_PUSHOVER_APPLICATION => node['security_guide']['monit']['pushover_application'],
-    :MONIT_PUSHOVER_USER => node['security_guide']['monit']['pushover_user'],
-    :MONIT_PUSHOVER_ENABLED => node['security_guide']['monit']['pushover_enabled']
-  })
 end
 
 # Restart all the services
