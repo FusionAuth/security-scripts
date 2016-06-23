@@ -33,7 +33,6 @@ default['security_guide']['monit']['slack_url'] = ''
 default['security_guide']['monit']['slack_enabled'] = false
 default['security_guide']['monit']['pushover_application'] = ''
 default['security_guide']['monit']['pushover_user'] = ''
-default['security_guide']['monit']['pushover_user'] = ''
 default['security_guide']['monit']['pushover_enabled'] = false
 
 # IPTable config

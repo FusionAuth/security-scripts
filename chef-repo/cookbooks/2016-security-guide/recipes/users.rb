@@ -17,8 +17,6 @@ existing_usernames.delete('vagrant')
 new_usernames = node['security_guide']['users'].map { |user| user.username }
 users_to_delete = existing_usernames.delete_if { |u| new_usernames.include?(u) }
 
-puts "existing_usernames is #{existing_usernames} and users_to_delete is #{users_to_delete} and new_usernames is #{new_usernames}"
-
 # Delete users
 if users_to_delete != nil
   users_to_delete.each do |username|
