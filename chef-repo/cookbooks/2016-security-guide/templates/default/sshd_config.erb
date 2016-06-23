@@ -1,0 +1,78 @@
+# Package generated configuration file
+# See the sshd_config(5) manpage for details
+
+# What ports, IPs and protocols we listen for
+Port <%= node['security_guide']['sshd']['listen_port'] %>
+
+# HostKeys for protocol version 2
+Protocol 2
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_dsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Privilege Separation is turned on for security
+UsePrivilegeSeparation yes
+
+# Lifetime and size of ephemeral version 1 server key
+KeyRegenerationInterval 3600
+ServerKeyBits 1024
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Authentication:
+LoginGraceTime 120
+StrictModes yes
+
+#
+# 2016-SECURITY-GUIDE ADDITION: Disable root login
+#
+PermitRootLogin no
+
+RSAAuthentication yes
+PubkeyAuthentication yes
+
+# Don't read the user's ~/.rhosts and ~/.shosts files
+IgnoreRhosts yes
+
+# For this to work you will also need host keys in /etc/ssh_known_hosts
+RhostsRSAAuthentication no
+
+# similar for protocol version 2
+HostbasedAuthentication no
+
+# To enable empty passwords, change to yes (NOT RECOMMENDED)
+PermitEmptyPasswords no
+
+#
+# 2016-SECURITY-GUIDE ADDITION: Enable two-factor authentication
+#
+<% if node['security_guide']['two_factor_enabled'] %>
+ChallengeResponseAuthentication yes
+AuthenticationMethods publickey,keyboard-interactive
+<% else %>
+ChallengeResponseAuthentication no
+AuthenticationMethods publickey
+<% end %>
+
+#
+# 2016-SECURITY-GUIDE ADDITION: No passwords
+#
+PasswordAuthentication no
+
+X11Forwarding yes
+X11DisplayOffset 10
+PrintMotd no
+PrintLastLog yes
+TCPKeepAlive yes
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+# Enable PAM
+UsePAM yes
+

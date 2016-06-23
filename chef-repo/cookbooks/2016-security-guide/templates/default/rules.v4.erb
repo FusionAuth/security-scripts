@@ -12,11 +12,9 @@
 # Acceptable UDP traffic
 
 # Acceptable TCP traffic
--A TCP -p tcp --dport 22 -j ACCEPT
--A TCP -p tcp --dport 443 -j ACCEPT
--A TCP -p tcp --dport 80 -j ACCEPT
--A TCP -p tcp --dport 3000 -j ACCEPT
--A TCP -p tcp --dport 3003 -j ACCEPT
+<% node['security_guide']['iptables']['tcp']['listen_ports'].each do |port| %>
+-A TCP -p tcp --dport <%= port %> <% if node['security_guide']['iptables']['tcp']['source_ips'][port] != nil %> -s <%= node['security_guide']['iptables']['tcp']['source_ips'][port] %> <% end %> -j ACCEPT
+<% end %>
 
 # Acceptable ICMP traffic
 
@@ -49,8 +47,9 @@ COMMIT
 :OUTPUT ACCEPT [0:0]
 :POSTROUTING ACCEPT [0:0]
 
--A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 3000
--A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 3003
+<% node['security_guide']['iptables']['tcp']['forward_ports'].each do |dport, toport| %>
+-A PREROUTING -p tcp --dport <%= dport %> -j REDIRECT --to-port <%= toport %>
+<% end %>
 
 COMMIT
 
