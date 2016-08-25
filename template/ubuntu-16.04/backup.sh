@@ -28,7 +28,7 @@ openssl rand 32 -out ${BACKUP_PASSPHRASE_FILE}
 openssl enc -aes-256-cbc -pass file:${BACKUP_PASSPHRASE_FILE} < ${BACKUP_FILE} > ${BACKUP_FILE_ENCRYPTED}
 
 # Encrypt the passphrase
-openssl rsautl -encrypt -pubin -inkey ~/public-key.pem < ${BACKUP_PASSPHRASE_FILE} > ${BACKUP_PASSPHRASE_FILE_ENCRYPTED}
+openssl rsautl -encrypt -pubin -inkey /root/public-key.pem < ${BACKUP_PASSPHRASE_FILE} > ${BACKUP_PASSPHRASE_FILE_ENCRYPTED}
 
 # Clean up
 rm ${BACKUP_FILE} ${BACKUP_PASSPHRASE_FILE}
