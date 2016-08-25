@@ -12,8 +12,8 @@ mkdir ${BACKUP_DIR}
 cd ${BACKUP_DIR}
 
 # Delete the oldest files by only listing out everything older than the newest 7 files
-ls *.gz.enc | sort | tail -n +7 | xargs rm
-ls *.gz.passphrase.enc | sort | tail -n +7 | xargs rm
+ls *.tar.gz.enc | sort | tail -n +7 | xargs rm
+ls *.passphrase.enc | sort | tail -n +7 | xargs rm
 
 # Backup the MySQL databases
 mysqldump -u<username> -p<password> production > production.sql
