@@ -31,7 +31,7 @@ openssl enc -aes-256-cbc -pass file:${BACKUP_PASSPHRASE_FILE} < ${BACKUP_FILE} >
 openssl rsautl -encrypt -pubin -inkey /root/public-key.pem < ${BACKUP_PASSPHRASE_FILE} > ${BACKUP_PASSPHRASE_FILE_ENCRYPTED}
 
 # Clean up
-rm ${BACKUP_FILE} ${BACKUP_PASSPHRASE_FILE}
+rm ${BACKUP_FILE} ${BACKUP_PASSPHRASE_FILE} *.sql
 
 # Copy offsite
 #scp ${BACKUP_FILE_ENCRYPTED} ${BACKUP_PASSPHRASE_FILE_ENCRYPTED} <username>@<backup-server>:backups/.
