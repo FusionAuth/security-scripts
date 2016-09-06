@@ -1,6 +1,8 @@
 #!/bin/bash
 
-BACKUP_DIR=/tmp/backups
+BACKUP_DIR=/root/backups
+# You may consider a more temporary directory if backups are stored offsite:
+# BACKUP_DIR=/tmp/backups
 DATE=`date +%Y%m%d`
 BACKUP_FILE="${DATE}.tar.gz"
 BACKUP_FILE_ENCRYPTED="${DATE}.tar.gz.enc"
