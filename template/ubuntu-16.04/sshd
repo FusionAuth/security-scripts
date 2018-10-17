@@ -4,7 +4,7 @@
 @include common-auth
 
 #
-# 2016-SECURITY-SCRIPT ADDITION: Google Authenticator module
+# SECURITY-SCRIPT ADDITION: Google Authenticator module
 #
 auth [success=done new_authtok_reqd=done default=die] pam_google_authenticator.so nullok
 

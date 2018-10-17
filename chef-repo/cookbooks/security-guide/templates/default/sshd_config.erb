@@ -27,7 +27,7 @@ LoginGraceTime 120
 StrictModes yes
 
 #
-# 2016-SECURITY-GUIDE ADDITION: Disable root login
+# SECURITY-GUIDE ADDITION: Disable root login
 #
 PermitRootLogin no
 
@@ -47,7 +47,7 @@ HostbasedAuthentication no
 PermitEmptyPasswords no
 
 #
-# 2016-SECURITY-GUIDE ADDITION: Enable two-factor authentication
+# SECURITY-GUIDE ADDITION: Enable two-factor authentication
 #
 <% if node['security_guide']['two_factor_enabled'] %>
 ChallengeResponseAuthentication yes
@@ -58,7 +58,7 @@ AuthenticationMethods publickey
 <% end %>
 
 #
-# 2016-SECURITY-GUIDE ADDITION: No passwords
+# SECURITY-GUIDE ADDITION: No passwords
 #
 PasswordAuthentication no
 

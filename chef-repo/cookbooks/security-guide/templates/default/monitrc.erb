@@ -19,7 +19,7 @@
 #
 
 #
-# 2016-SECURITY-SCRIPT ADDITION: Check interval 5 seconds
+# SECURITY-SCRIPT ADDITION: Check interval 5 seconds
 #
   set daemon 5
 
@@ -81,7 +81,7 @@
 #
 
 #
-# 2016-SECURITY-SCRIPT ADDITION: Email server configuration
+# SECURITY-SCRIPT ADDITION: Email server configuration
 #
 set mailserver <%= node['security_guide']['monit']['email_server'] %> port <%= node['security_guide']['monit']['email_port'] %> <% if node['security_guide']['monit'].attribute?('email_username') %>username "<%= node['security_guide']['monit']['email_username'] %>"<% end %> <% if node['security_guide']['monit'].attribute?('email_password') %>password "<%= node['security_guide']['monit']['email_password'] %>"<% end %> <% if node['security_guide']['monit'].attribute?('email_encryption') %><%= node['security_guide']['monit']['email_encryption'] %><% end %>
 
@@ -164,7 +164,7 @@ set mailserver <%= node['security_guide']['monit']['email_server'] %> port <%= n
 #
 
 #
-# 2016-SECURITY-SCRIPT ADDITION: Set alert email address
+# SECURITY-SCRIPT ADDITION: Set alert email address
 #
 set alert <%= node['security_guide']['monit']['alert_email'] %> not on { instance, action }
 

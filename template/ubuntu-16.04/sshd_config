@@ -28,7 +28,7 @@ LoginGraceTime 120
 StrictModes yes
 
 #
-# 2016-SECURITY-SCRIPT ADDITION: Disable root login
+# SECURITY-SCRIPT ADDITION: Disable root login
 #
 PermitRootLogin no
 
@@ -49,13 +49,13 @@ HostbasedAuthentication no
 PermitEmptyPasswords no
 
 #
-# 2016-SECURITY-SCRIPT ADDITION: Enable two-factor authentication
+# SECURITY-SCRIPT ADDITION: Enable two-factor authentication
 #
 ChallengeResponseAuthentication yes
 AuthenticationMethods publickey,keyboard-interactive
 
 #
-# 2016-SECURITY-SCRIPT ADDITION: No passwords
+# SECURITY-SCRIPT ADDITION: No passwords
 #
 PasswordAuthentication no
 

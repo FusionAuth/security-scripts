@@ -1,8 +1,8 @@
-# 2016_security_guide
+# security_guide
 
-This is the Chef Cookbook that models all of the server setup based on Inversoft's for the 2016 Security Guide located here:
+This is the Chef Cookbook that models all of the server setup based on FusionAuth's Guide to User Data Security found here:
 
-https://www.inversoft.com/guides/2016-guide-to-user-data-security
+https://fusionauth.io/resources/guide-to-user-data-security
 
 To use this Chef Cookbook, all you need to do is configure these required attributes:
 

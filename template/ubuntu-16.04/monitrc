@@ -19,7 +19,7 @@
 #
 
 #
-# 2016-SECURITY-SCRIPT ADDITION: Check interval 5 seconds
+# SECURITY-SCRIPT ADDITION: Check interval 5 seconds
 #
   set daemon 5
 
@@ -81,7 +81,7 @@
 #
 
 #
-# 2016-SECURITY-SCRIPT ADDITION: Email server configuration
+# SECURITY-SCRIPT ADDITION: Email server configuration
 #
 set mailserver @MONIT_EMAIL_SERVER@ port @MONIT_EMAIL_PORT@ username "@MONIT_EMAIL_USERNAME@" password "@MONIT_EMAIL_PASSWORD@" @MONIT_EMAIL_ENCRYPTION@
 
@@ -164,7 +164,7 @@ set mailserver @MONIT_EMAIL_SERVER@ port @MONIT_EMAIL_PORT@ username "@MONIT_EMA
 #
 
 #
-# 2016-SECURITY-SCRIPT ADDITION: Set alert email address
+# SECURITY-SCRIPT ADDITION: Set alert email address
 #
 set alert @MONIT_ALERT_EMAIL@ not on { instance, action }
 

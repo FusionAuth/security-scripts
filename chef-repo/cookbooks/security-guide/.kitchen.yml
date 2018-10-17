@@ -14,5 +14,5 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[2016_security_guide::default]
+      - recipe[security_guide::default]
     attributes:

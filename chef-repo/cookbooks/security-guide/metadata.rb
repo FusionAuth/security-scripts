@@ -1,9 +1,9 @@
-name '2016_security_guide'
+name 'security_guide'
 maintainer 'Inversoft'
 maintainer_email 'brian@inversoft.com'
 license 'all_rights'
-description 'Installs/Configures 2016_security_guide'
-long_description 'Installs/Configures 2016_security_guide'
+description 'Installs/Configures security_guide'
+long_description 'Installs/Configures security_guide'
 version '0.1.0'
 attribute 'security_guide/users',
           :display_name => 'Users',

@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: 2016_security_guide
+# Cookbook Name:: security_guide
 # Recipe:: default
 #
-# Copyright (c) 2016 Inversoft, All Rights Reserved.
+# Copyright (c) 2018 FusionAuth, All Rights Reserved.
 
 # Install the two-factor library
 package 'ntp'
