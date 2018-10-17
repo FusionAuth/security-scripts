@@ -1,4 +1,4 @@
-# 2016-security-scripts
+# security-scripts
 
 This project contains a set of bash scripts that can be used to secure a new Linux server. The scripts are broken into parts:
 
@@ -31,7 +31,7 @@ You can also use the Chef Cookbook instead of the `configure.sh` and `setup-new-
 
 ```
 $ cd chef-repo
-$ knife cookbook upload 2016_security_guide
+$ knife cookbook upload security_guide
 ```
 
 This will add the Cookbook to the Chef server that is configured in your `knife.rb` file. From there, you can use the Cookbook to bootstrap your nodes.
