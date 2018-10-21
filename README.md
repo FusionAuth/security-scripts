@@ -1,4 +1,7 @@
-# security-scripts
+# Security Scripts
+
+These scripts provided a practical implementation of the steps and practices described in the FusionAuth Security Guide. 
+https://fusionauth.io/resources/guide-to-user-data-security
 
 This project contains a set of bash scripts that can be used to secure a new Linux server. The scripts are broken into parts:
 
